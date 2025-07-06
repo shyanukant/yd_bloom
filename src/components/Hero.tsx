@@ -12,12 +12,7 @@ const Hero = () => {
         <div className="absolute top-20 left-10 w-16 h-8 bg-white/60 rounded-full animate-pulse"></div>
         <div className="absolute top-32 right-20 w-12 h-6 bg-white/50 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
         <div className="absolute top-16 right-1/3 w-20 h-10 bg-white/70 rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
-        
-        {/* Store Booth Elements */}
-        <div className="absolute bottom-10 right-10 w-32 h-40 bg-gradient-to-b from-red-400 to-red-500 rounded-t-full hidden md:block cartoon-shadow">
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-20 h-6 bg-white rounded-lg"></div>
-          <div className="absolute top-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-red-600">YD BLOOM</div>
-        </div>
+      
         
         {/* Adventure Path */}
         <div className="absolute bottom-0 left-0 w-full h-4 bg-gradient-to-r from-yellow-300/50 via-orange-300/50 to-pink-300/50 rounded-t-lg hidden lg:block"></div>
@@ -134,7 +129,8 @@ const Hero = () => {
             </Link>
           </div>
         </div>
-      </div>
+      </div> 
+      
     </section>
   );
 };

@@ -41,9 +41,7 @@ const Header = () => {
             <Link to="/girls" className="font-playful text-foreground hover:text-primary transition-colors duration-300 hover:wiggle">
               Girls
             </Link>
-            <Link to="/collections" className="font-playful text-foreground hover:text-primary transition-colors duration-300 hover:wiggle">
-              Sale
-            </Link>
+            
             <Link to="/about" className="font-playful text-foreground hover:text-primary transition-colors duration-300 hover:wiggle">
               About
             </Link>
