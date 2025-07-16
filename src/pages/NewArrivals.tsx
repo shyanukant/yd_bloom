@@ -4,11 +4,29 @@ import WhatsAppChat from "@/components/WhatsAppChat";
 import FAQChatbot from "@/components/FAQChatbot";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import { products } from "@/data/products";
+import { useEffect, useState } from "react";
+import { getProducts, Product } from "@/services/productService";
 import ProductCard from "@/components/ProductCard";
 
 const NewArrivals = () => {
-  const newProducts = products.filter(product => product.isNew);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const allProducts = await getProducts();
+        const newArrivals = allProducts.filter(product => product.isNew);
+        setProducts(newArrivals);
+      } catch (error) {
+        console.error('Error loading products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -26,23 +44,27 @@ const NewArrivals = () => {
               New Arrivals
             </h1>
             <p className="font-body text-lg text-muted-foreground max-w-2xl">
-              Fresh styles just landed! Discover the latest additions to our magical 
-              collection of children's clothing.
+              Fresh styles just arrived! Be the first to discover our latest collection 
+              of trendy and comfortable kids' fashion.
             </p>
           </div>
 
-          {/* Products Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {newProducts.map((product, index) => (
-              <ProductCard key={product.id} product={product} index={index} />
-            ))}
-          </div>
-
-          {newProducts.length === 0 && (
+          {loading ? (
             <div className="text-center py-12">
-              <div className="text-6xl mb-4">✨</div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p>Loading products...</p>
+            </div>
+          ) : products.length > 0 ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {products.map((product, index) => (
+                <ProductCard key={product.id} product={product} index={index} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">🆕</div>
               <p className="font-body text-lg text-muted-foreground">
-                New magical pieces are coming soon! Check back for fresh arrivals.
+                No new arrivals available at the moment.
               </p>
             </div>
           )}

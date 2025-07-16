@@ -1,20 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-export interface Product {
-  id: number;
-  name: string;
-  price: string;
-  originalPrice?: string;
-  image: string;
-  emoji: string;
-  description: string;
-  rating: number;
-  category: 'boys' | 'girls' | 'unisex';
-  isNew?: boolean;
-  isPopular?: boolean;
-  realImage?: string;
-  additionalImages?: string[];
-}
+import { Product } from '@/services/productService';
 
 interface CartItem extends Product {
   quantity: number;
@@ -23,8 +8,8 @@ interface CartItem extends Product {
 interface CartContextType {
   cartItems: CartItem[];
   addToCart: (product: Product) => void;
-  removeFromCart: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
+  removeFromCart: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   getCartTotal: () => number;
   redirectToWhatsApp: () => void;
@@ -57,11 +42,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
   };
 
-  const removeFromCart = (productId: number) => {
+  const removeFromCart = (productId: string) => {
     setCartItems(prev => prev.filter(item => item.id !== productId));
   };
 
-  const updateQuantity = (productId: number, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(productId);
       return;
@@ -79,8 +64,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const getCartTotal = () => {
     return cartItems.reduce((total, item) => {
-      const price = parseFloat(item.price.replace('$', ''));
-      return total + (price * item.quantity);
+      return total + (item.price * item.quantity);
     }, 0);
   };
 

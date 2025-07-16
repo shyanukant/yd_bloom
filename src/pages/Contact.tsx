@@ -1,37 +1,11 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppChat from "@/components/WhatsAppChat";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import ContactForm from "@/components/ContactForm";
 import { ArrowLeft, MapPin, Phone, Mail, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const whatsappMessage = `Hi! I'm ${formData.name} (${formData.email})\n\nSubject: ${formData.subject}\n\nMessage: ${formData.message}`;
-    const phoneNumber = "+971545314090";
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
-    window.open(whatsappUrl, '_blank');
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -55,62 +29,7 @@ const Contact = () => {
 
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Contact Form */}
-            <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-3xl p-8 cartoon-shadow">
-              <h2 className="font-brand text-2xl text-primary mb-6">Send us a Message</h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="name" className="font-playful">Name</Label>
-                    <Input 
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email" className="font-playful">Email</Label>
-                    <Input 
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="subject" className="font-playful">Subject</Label>
-                  <Input 
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    required
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="message" className="font-playful">Message</Label>
-                  <Textarea 
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    rows={5}
-                    className="mt-1"
-                  />
-                </div>
-                <Button type="submit" className="w-full bg-gradient-bloom font-playful">
-                  Send Message via WhatsApp
-                </Button>
-              </form>
-            </div>
+            <ContactForm />
 
             {/* Contact Information */}
             <div className="space-y-8">

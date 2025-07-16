@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppChat from "@/components/WhatsAppChat";
@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Heart, Share2, Star, Plus, Minus, ShoppingBag, Truck, Shield, RotateCcw } from "lucide-react";
-import { products } from "@/data/products";
+import { getProductById, Product } from "@/services/productService";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 
@@ -16,12 +16,40 @@ const ProductDetails = () => {
   const { id } = useParams();
   const { addToCart } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState("2-3Y");
-  const [selectedColor, setSelectedColor] = useState("Primary");
+  const [selectedSize, setSelectedSize] = useState("3T");
+  const [selectedColor, setSelectedColor] = useState("Default");
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const product = products.find(p => p.id === parseInt(id || "0"));
+  useEffect(() => {
+    const loadProduct = async () => {
+      if (!id) return;
+      
+      try {
+        const productData = await getProductById(id);
+        setProduct(productData);
+      } catch (error) {
+        console.error('Error loading product:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProduct();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading product...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -36,14 +64,13 @@ const ProductDetails = () => {
     );
   }
 
-  // Use real images and additional images from the product data
-  const productImages = [
-    product.realImage || "/placeholder.svg",
-    ...(product.additionalImages || [])
-  ];
+  // Use images from the product data
+  const productImages = product.colors && product.colors.length > 0 
+    ? product.colors[0].images 
+    : [product.mainImage];
 
-  const sizes = ["0-6M", "6-12M", "1-2Y", "2-3Y", "3-4Y", "4-5Y", "5-6Y"];
-  const colors = ["Primary", "Pink", "Blue", "Green", "Yellow"];
+  const sizes = product.sizes || ["6M", "12M", "18M", "2T", "3T", "4T", "5T", "6T", "7T", "8T", "9T", "10T"];
+  const colors = product.colors?.map(c => c.name) || ["Default"];
 
   const reviews = [
     { name: "Sarah M.", rating: 5, comment: "Absolutely adorable! My daughter loves it and the quality is amazing." },
@@ -70,7 +97,7 @@ const ProductDetails = () => {
     const message = `Hi! I'm interested in this product from YD Bloom:
 
 ${product.name}
-Price: ${product.price}
+Price: $${product.price}
 Size: ${selectedSize}
 Color: ${selectedColor}
 Quantity: ${quantity}
@@ -106,7 +133,7 @@ Can you help me with ordering and shipping details?`;
           <div className="space-y-4">
             <div className="aspect-square rounded-2xl overflow-hidden cartoon-shadow">
               <img 
-                src={productImages[selectedImage]} 
+                src={productImages[selectedImage] || product.mainImage} 
                 alt={product.name}
                 className="w-full h-full object-cover"
                 onError={(e) => {
@@ -182,13 +209,13 @@ Can you help me with ordering and shipping details?`;
 
               {/* Price */}
               <div className="flex items-baseline gap-3 mb-6">
-                <span className="font-brand text-3xl text-foreground">{product.price}</span>
+                <span className="font-brand text-3xl text-foreground">${product.price.toFixed(2)}</span>
                 {product.originalPrice && (
-                  <span className="text-xl text-muted-foreground line-through">{product.originalPrice}</span>
+                  <span className="text-xl text-muted-foreground line-through">${product.originalPrice.toFixed(2)}</span>
                 )}
                 {product.originalPrice && (
                   <Badge variant="destructive" className="text-xs">
-                    Save {Math.round((1 - parseInt(product.price.replace('$', '')) / parseInt(product.originalPrice.replace('$', ''))) * 100)}%
+                    Save {Math.round((1 - product.price / product.originalPrice) * 100)}%
                   </Badge>
                 )}
               </div>
@@ -266,7 +293,7 @@ Can you help me with ordering and shipping details?`;
                 size="lg"
               >
                 <ShoppingBag className="h-5 w-5 mr-2" />
-                Add to Cart - {product.price}
+                Add to Cart - ${product.price.toFixed(2)}
               </Button>
               
               <div className="grid grid-cols-3 gap-2 text-sm">
@@ -335,13 +362,18 @@ Can you help me with ordering and shipping details?`;
                         </tr>
                       </thead>
                       <tbody>
-                        <tr><td className="border border-border p-3">0-6M</td><td className="border border-border p-3">0-6 months</td><td className="border border-border p-3">50-68</td><td className="border border-border p-3">3-8</td></tr>
-                        <tr><td className="border border-border p-3">6-12M</td><td className="border border-border p-3">6-12 months</td><td className="border border-border p-3">68-80</td><td className="border border-border p-3">8-12</td></tr>
-                        <tr><td className="border border-border p-3">1-2Y</td><td className="border border-border p-3">1-2 years</td><td className="border border-border p-3">80-92</td><td className="border border-border p-3">12-15</td></tr>
-                        <tr><td className="border border-border p-3">2-3Y</td><td className="border border-border p-3">2-3 years</td><td className="border border-border p-3">92-98</td><td className="border border-border p-3">15-18</td></tr>
-                        <tr><td className="border border-border p-3">3-4Y</td><td className="border border-border p-3">3-4 years</td><td className="border border-border p-3">98-104</td><td className="border border-border p-3">18-21</td></tr>
-                        <tr><td className="border border-border p-3">4-5Y</td><td className="border border-border p-3">4-5 years</td><td className="border border-border p-3">104-110</td><td className="border border-border p-3">21-24</td></tr>
-                        <tr><td className="border border-border p-3">5-6Y</td><td className="border border-border p-3">5-6 years</td><td className="border border-border p-3">110-116</td><td className="border border-border p-3">24-27</td></tr>
+                        <tr><td className="border border-border p-3">6M</td><td className="border border-border p-3">0-6 months</td><td className="border border-border p-3">50-68</td><td className="border border-border p-3">3-8</td></tr>
+                        <tr><td className="border border-border p-3">12M</td><td className="border border-border p-3">6-12 months</td><td className="border border-border p-3">68-80</td><td className="border border-border p-3">8-12</td></tr>
+                        <tr><td className="border border-border p-3">18M</td><td className="border border-border p-3">12-18 months</td><td className="border border-border p-3">80-92</td><td className="border border-border p-3">12-15</td></tr>
+                        <tr><td className="border border-border p-3">2T</td><td className="border border-border p-3">18-24 months</td><td className="border border-border p-3">92-98</td><td className="border border-border p-3">15-18</td></tr>
+                        <tr><td className="border border-border p-3">3T</td><td className="border border-border p-3">2-3 years</td><td className="border border-border p-3">98-104</td><td className="border border-border p-3">18-21</td></tr>
+                        <tr><td className="border border-border p-3">4T</td><td className="border border-border p-3">3-4 years</td><td className="border border-border p-3">104-110</td><td className="border border-border p-3">21-24</td></tr>
+                        <tr><td className="border border-border p-3">5T</td><td className="border border-border p-3">4-5 years</td><td className="border border-border p-3">110-116</td><td className="border border-border p-3">24-27</td></tr>
+                        <tr><td className="border border-border p-3">6T</td><td className="border border-border p-3">5-6 years</td><td className="border border-border p-3">110-116</td><td className="border border-border p-3">24-27</td></tr>
+                        <tr><td className="border border-border p-3">7T</td><td className="border border-border p-3">6-7 years</td><td className="border border-border p-3">116-122</td><td className="border border-border p-3">27-30</td></tr>
+                        <tr><td className="border border-border p-3">8T</td><td className="border border-border p-3">7-8 years</td><td className="border border-border p-3">122-128</td><td className="border border-border p-3">30-33</td></tr>
+                        <tr><td className="border border-border p-3">9T</td><td className="border border-border p-3">8-9 years</td><td className="border border-border p-3">128-134</td><td className="border border-border p-3">33-36</td></tr>
+                        <tr><td className="border border-border p-3">10T</td><td className="border border-border p-3">9-10 years</td><td className="border border-border p-3">134-140</td><td className="border border-border p-3">36-39</td></tr>
                       </tbody>
                     </table>
                   </div>

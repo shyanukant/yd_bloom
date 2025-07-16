@@ -1,7 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingBag, Star } from "lucide-react";
-import { Product, useCart } from "@/contexts/CartContext";
+import { useCart } from "@/contexts/CartContext";
+import { Product } from "@/services/productService";
 import { Link } from "react-router-dom";
 
 interface ProductCardProps {
@@ -21,13 +22,28 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
     const message = `Hi! I'm interested in this product from YD Bloom:
 
 ${product.name}
-Price: ${product.price}
+Price: ${formatPrice(product.price)}
 Description: ${product.description}
 
 Can you help me with ordering and shipping details?`;
     
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
+  };
+
+  // Format price for display
+  const formatPrice = (price: number | string) => {
+    if (typeof price === 'string') {
+      // If price is already formatted as string (e.g., "$25.99"), return as is
+      if (price.startsWith('$')) {
+        return price;
+      }
+      // If price is a string number, convert to number first
+      const numPrice = parseFloat(price);
+      return `$${numPrice.toFixed(2)}`;
+    }
+    // If price is a number, format it
+    return `$${price.toFixed(2)}`;
   };
 
   return (
@@ -63,14 +79,14 @@ Can you help me with ordering and shipping details?`;
 
             {/* Product Emoji/Image */}
             <div className="text-6xl mb-2 mascot-wave" style={{ animationDelay: `${index * 0.2}s` }}>
-              {product.realImage ? (
+              {(product.mainImage || product.realImage) ? (
                 <img 
-                  src={product.realImage} 
+                  src={product.mainImage || product.realImage} 
                   alt={product.name}
                   className="w-full h-32 object-cover rounded-lg"
                 />
               ) : (
-                product.image
+                product.emoji
               )}
             </div>
             <div className="text-2xl float-gentle" style={{ animationDelay: `${index * 0.3}s` }}>
@@ -104,11 +120,11 @@ Can you help me with ordering and shipping details?`;
             <div className="flex items-center justify-between mb-4">
               <div>
                 <span className="font-playful font-bold text-lg text-foreground">
-                  {product.price}
+                  {formatPrice(product.price)}
                 </span>
                 {product.originalPrice && (
                   <span className="text-sm text-muted-foreground line-through ml-2">
-                    {product.originalPrice}
+                    {formatPrice(product.originalPrice)}
                   </span>
                 )}
               </div>

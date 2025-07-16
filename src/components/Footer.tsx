@@ -1,5 +1,6 @@
 import { Flower, Heart, MapPin, Phone, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import NewsletterWidget from "./NewsletterWidget";
 
 const Footer = () => {
   return (
@@ -104,16 +105,7 @@ const Footer = () => {
           <p className="font-body text-primary-foreground/80 mb-6">
             Get the latest styles, exclusive offers, and parenting tips delivered to your inbox.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input 
-              type="email" 
-              placeholder="Enter your email" 
-              className="flex-1 px-4 py-3 rounded-2xl border-2 border-white/20 bg-white/10 text-primary-foreground placeholder-primary-foreground/60 font-body"
-            />
-            <Button className="bg-white text-primary hover:bg-white/90 font-playful px-6 py-3 hover:scale-105 transition-transform">
-              Subscribe 📬
-            </Button>
-          </div>
+          <NewsletterWidget />
         </div>
 
         {/* Bottom Bar */}

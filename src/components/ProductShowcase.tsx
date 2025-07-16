@@ -1,11 +1,48 @@
 import { Star } from "lucide-react";
-import { products } from "@/data/products";
+import { useEffect, useState } from "react";
+import { getProducts, Product } from "@/services/productService";
 import ProductCard from "./ProductCard";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 const ProductShowcase = () => {
-  const featuredProducts = products.slice(0, 8);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const allProducts = await getProducts();
+        // Show featured products first, then a mix of other products
+        const featuredProducts = allProducts.filter(p => p.featured);
+        const otherProducts = allProducts.filter(p => !p.featured);
+        const previewProducts = [
+          ...featuredProducts.slice(0, 4),
+          ...otherProducts.slice(0, 4)
+        ].slice(0, 8); // Show max 8 products
+        setProducts(previewProducts);
+      } catch (error) {
+        console.error('Error loading products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p>Loading products...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-background">
@@ -31,11 +68,20 @@ const ProductShowcase = () => {
         </div>
 
         {/* Products Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredProducts.map((product, index) => (
-            <ProductCard key={product.id} product={product} index={index} />
-          ))}
-        </div>
+        {products.length > 0 ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {products.map((product, index) => (
+              <ProductCard key={product.id} product={product} index={index} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">👕</div>
+            <p className="font-body text-lg text-muted-foreground">
+              No products available at the moment.
+            </p>
+          </div>
+        )}
 
         {/* View All Button */}
         <div className="text-center mt-12">
@@ -45,7 +91,7 @@ const ProductShowcase = () => {
               variant="outline" 
               className="playful-border font-playful px-8 hover:bg-gradient-sunshine hover:scale-105 transition-all"
             >
-              View All {products.length} Products
+              View All Products
             </Button>
           </Link>
         </div>

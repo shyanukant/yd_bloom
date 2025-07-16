@@ -1,14 +1,25 @@
 import { useState } from "react";
-import { Menu, X, Flower, ShoppingBag } from "lucide-react";
+import { Menu, X, Flower, ShoppingBag, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Input } from "@/components/ui/input";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const { cartItems } = useCart();
+  const navigate = useNavigate();
   
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/shop?search=${encodeURIComponent(searchTerm.trim())}`);
+      setSearchTerm('');
+    }
+  };
 
   return (
     <header className="bg-gradient-sky sticky top-0 z-50 cartoon-shadow">
@@ -32,8 +43,8 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link to="/new-arrivals" className="font-playful text-foreground hover:text-primary transition-colors duration-300 hover:wiggle">
-              New Arrivals
+            <Link to="/shop" className="font-playful text-foreground hover:text-primary transition-colors duration-300 hover:wiggle">
+              Shop
             </Link>
             <Link to="/boys" className="font-playful text-foreground hover:text-primary transition-colors duration-300 hover:wiggle">
               Boys
@@ -49,6 +60,17 @@ const Header = () => {
               Contact
             </Link>
           </nav>
+
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} className="hidden md:block relative max-w-xs">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </form>
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
@@ -84,8 +106,8 @@ const Header = () => {
         {isMenuOpen && (
           <nav className="md:hidden mt-4 pb-4 border-t border-border pt-4">
             <div className="flex flex-col space-y-3">
-              <Link to="/new-arrivals" className="font-playful text-foreground hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-                New Arrivals
+              <Link to="/shop" className="font-playful text-foreground hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
+                Shop
               </Link>
               <Link to="/boys" className="font-playful text-foreground hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
                 Boys
